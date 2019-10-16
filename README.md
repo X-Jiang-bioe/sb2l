@@ -1,2 +1,2 @@
 # py-sbml2latex
-Translates the biological models written in SBML into LaTeX code to be compiled and read by human eye
+Translates biological models written in SBML into LaTeX code to be compiled and read by human eye
