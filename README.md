@@ -6,7 +6,7 @@ Translates biological models written in SBML into LaTeX code to be compiled and 
 
 ### How to Use ###
 
-### License ###\
+### License ###
 
 MIT License
 
