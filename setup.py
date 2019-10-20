@@ -1,21 +1,28 @@
-from distutils.core import setup
-setup(
+import setuptools
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+    
+setuptools.setup(
   name = 'sb2l',         
-  packages = ['sb2l'],   
-  version = '0.1',      
+    
+  version = '0.1.1',      
   license='MIT',        
-  description = 'sb2l Translates the biological models written in SBML into LaTeX code to be compiled and read by human eye',   # Give a short description about your library
+  description = 'sb2l Translates the biological models written in SBML into LaTeX code to be compiled and read by human eye',  
+  long_description=long_description,
+  long_description_content_type="text/markdown",
   author = 'Xieergai Jiang, Herbert Sauro',                   
   author_email = 'jiangxieergai@gmail.com',      
-  
   url = 'https://github.com/X-Jiang-bioe/sb2l',   
   
-  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.tar.gz',   
+  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.1.tar.gz',   
+  
   keywords = ['SBML', 'LaTeX', 'Converter'],   
   install_requires=[           
           'pylatex',
           'python-libsbml',
       ],
+  packages=setuptools.find_packages(),
   python_requires='>=3',
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
