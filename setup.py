@@ -8,9 +8,9 @@ setup(
   author = 'Xieergai Jiang, Herbert Sauro',                   
   author_email = 'jiangxieergai@gmail.com',      
   
-  url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.tar.gz',   
+  url = 'https://github.com/X-Jiang-bioe/sb2l',   
   
-  download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',   
+  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.tar.gz',   
   keywords = ['SBML', 'LaTeX', 'Converter'],   
   install_requires=[           
           'pylatex',
