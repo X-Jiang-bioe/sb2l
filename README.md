@@ -1,4 +1,4 @@
-# py-sbml2latex
+# sb2l
 
 ### Description ###
 
