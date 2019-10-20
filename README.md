@@ -6,24 +6,26 @@ Translates biological models written in SBML into LaTeX code to be compiled and 
 
 ### Dependencies ###
 
-The current cersion runs 1.3.1 version of PyLaTeX
+The current version runs 1.3.1 version of PyLaTeX
 
 For PDF creation functionality, either `latexmk` or `pdflatex` needs to be installed on the computer
 
 ### How to Use ###
-
+The following structure gives a LaTeX string that can be copied to a online compiler like `Overleaf`:
 ```
-import s2l
-latexStr = s2l.sbml2latex(sbmlString)
+import sb2l
+latexStr = sb2l.s2latex(sbmlStringOrFile)
 ```
 If using with Tellurium or Antimony: 
 ```
-latexStr = s2l.sbml2latex(model_name.getSBML())
+import sb2l
+latexStr = sb2l.s2latex(model_name.getSBML())
 ```
 For making PDF files (The filepath must NOT have a .pdf or .tex suffix)
 ```
-filepath = /Users/Username/Desktop/thefile
-s2l.sbml2latex(sbmlStringOrFile, filepath);
+import sb2l
+filepath = "/Users/Username/Desktop/theDesiredName" #[NOTICE: no ".anything"]
+sb2l.s2latex(sbmlStringOrFile, filepath);
 ```
 ### License ###
 
