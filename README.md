@@ -10,6 +10,10 @@ The current version runs 1.3.1 version of PyLaTeX
 
 For PDF creation functionality, either `latexmk` or `pdflatex` needs to be installed on the computer
 
+### Installation ###
+
+`pip install sb2l`
+
 ### How to Use ###
 The following structure gives a LaTeX string that can be copied to a online compiler like `Overleaf`:
 ```
