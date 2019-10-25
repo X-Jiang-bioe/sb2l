@@ -5,8 +5,9 @@ with open("README.md", "r") as fh:
     
 setuptools.setup(
   name = 'sb2l',         
-    
-  version = '0.1.1',      
+  packages=setuptools.find_packages(),
+  
+  version = '0.1.2',      
   license='MIT',        
   description = 'sb2l Translates the biological models written in SBML into LaTeX code to be compiled and read by human eye',  
   long_description=long_description,
@@ -15,21 +16,26 @@ setuptools.setup(
   author_email = 'jiangxieergai@gmail.com',      
   url = 'https://github.com/X-Jiang-bioe/sb2l',   
   
-  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.1.tar.gz',   
+  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.2.tar.gz',  
+  
+  
+  package_data={
+        '': ['*.xsl', '*.rtf'], # to include yarosh files
+    },
   
   keywords = ['SBML', 'LaTeX', 'Converter'],   
   install_requires=[           
           'pylatex',
           'python-libsbml',
       ],
-  packages=setuptools.find_packages(),
+  
   python_requires='>=3',
   classifiers=[
-    'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
-    'Intended Audience :: Science/Research',      # Define that your audience are developers
+    'Development Status :: 3 - Alpha',      
+    'Intended Audience :: Science/Research',     
     'Topic :: Software Development :: Build Tools',
-    'License :: OSI Approved :: MIT License',   # Again, pick a license
-    'Programming Language :: Python :: 3',      #Specify which pyhton versions that you want to support
+    'License :: OSI Approved :: MIT License',   
+    'Programming Language :: Python :: 3',      
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
