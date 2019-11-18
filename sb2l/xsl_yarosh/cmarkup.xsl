@@ -307,7 +307,7 @@
 		<xsl:if test="position() &gt; 1">
 			<xsl:choose>
 				<xsl:when test="self::m:cn">\times <!-- times --></xsl:when>
-				<xsl:otherwise><!--invisible times--></xsl:otherwise>
+				<xsl:otherwise>\times <!--XJiang - added \times here so that multiply is always in the equation--></xsl:otherwise>
 			</xsl:choose>
 		</xsl:if> 
 		<xsl:if test="position()&gt;= $first">
