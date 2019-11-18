@@ -8,7 +8,9 @@ SBML Utilitites
 """
 
 
-def s2latex (sbmlArgument, file_path = None):
+import os
+
+def s2string (sbmlArgument, file_path = None):
     ''' Convert sbml to a latex string
     
     Args: 
@@ -38,6 +40,7 @@ def s2latex (sbmlArgument, file_path = None):
         import os
         """ MathML to LaTeX conversion with XSLT from Vasil Yaroshevich, Modified by Xieergai Jiang"""
         script_base_path = os.path.dirname(os.path.realpath(__file__))
+        
         xslt_file = os.path.join(script_base_path, 'xsl_yarosh', 'mmltex.xsl')
         dom = etree.fromstring(equation)
         xslt = etree.parse(xslt_file)
@@ -90,7 +93,7 @@ def s2latex (sbmlArgument, file_path = None):
         lis = prefix.split('\n')
         i = len(lis)-1
         if ('  <listOfParameters>' in lis):
-            i = lis.index('  <listOfParameters>') #NOT EVERY MODEL WILL HAVE THIS THOUGH
+            i = lis.index('  <listOfParameters>') 
         lis = lis[1:i]
         for n in range(0, len(lis)):
             lis[n] = lis[n][2:] #so, here we are messing with indentation, not sure if it will be consistent
@@ -143,7 +146,9 @@ def s2latex (sbmlArgument, file_path = None):
         errMsgRead = oss.str()
         raise RuntimeError (errMsgRead)
 
-    Model_id = sbmldoc.model.getName() # This is essentially how each list is filled, using commands for LibSBML
+    Model_id = sbmldoc.model.getName() # This is essentially how each list is filled, using commands from LibSBML
+    if len(Model_id)<1:
+        Model_id = sbmldoc.model.getId()
     Model_id = Model_id.replace (r'_', r'\_')    
            
     Compartments = [] 
@@ -300,6 +305,7 @@ def s2latex (sbmlArgument, file_path = None):
     doc.packages.append (NoEscape(r"\usepackage{hyperref}"))
     doc.packages.append (NoEscape(r"\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}"))
     doc.packages.append (NoEscape(r"\usepackage{amsmath}"))
+    doc.packages.append (NoEscape(r"\usepackage{breqn}"))
     
     doc.preamble.append (NoEscape(r'\definecolor{blue}{cmyk}{.93, .59, 0, 0}'))
     doc.preamble.append ('')
@@ -390,6 +396,16 @@ def s2latex (sbmlArgument, file_path = None):
                     lis[i] = lis[i].replace("&apos;","'")
                 if ('&amp;' in lis[i]):
                     lis[i] = lis[i].replace("&amp;","&")
+                if ('&dollar;' in lis[i]):
+                    lis[i] = lis[i].replace("&dollar;","$")
+                if ('&num;' in lis[i]):
+                    lis[i] = lis[i].replace("&num;","#")
+                if ('&plus;' in lis[i]):
+                    lis[i] = lis[i].replace("&plus;","+")
+                if ('&excl;' in lis[i]):
+                    lis[i] = lis[i].replace("&excl;","!")
+                if ('&quest;' in lis[i]):
+                    lis[i] = lis[i].replace("&quest;","?")
                 if ('/' in lis[i] and 'br/>' not in lis[i] and '//' 
                     not in lis[i] and len(lis[i].replace(" ",""))<4 and 'strong>' not in lis[i]):
                     continue #! trying to skip every instance of </something> assuming the 4 length as cutoff
@@ -453,6 +469,26 @@ def s2latex (sbmlArgument, file_path = None):
                  table.add_row ('Reactions', str (len(Reactions)), 'Events', str (len(Events)))
                  table.add_row ('Global Parameters', str (len(Parameters)), 'Function Definitions', str (len(FunctionDefinitions)))
             table1.add_caption ('Components in this model.')
+            
+            
+            
+    # COMPARTMENTS TABLE
+    listlen = len(Compartments) #number of rows
+    sublistlen = len(Compartments[0]) #number of columns 
+    tbl_cmnd ='' 
+    tbl_cmnd = tbl_cmnd.join('c|' for i in range(0, sublistlen))
+    tbl_cmnd = tbl_cmnd[:-1] 
+    
+    with doc.create(Section('Compartments')):
+        doc.append('Table of comparments in the model:')
+        with doc.create(LongTable(tbl_cmnd, booktabs = True)) as table:
+            table.add_row(('ID', 'SBO ', 'Spatial ', 'Size', 'Constant'))
+            table.add_row(('', 'Term','Dimensions','', ''))
+            table.add_hline()
+            for i in range(0, listlen):
+                if math.isnan (Compartments[i][1]):
+                   Species[i][1] = 'undefined'
+                table.add_row(tuple(Compartments[i]))
         
     # SPECIES TABLE
     # getting info from the list
@@ -515,16 +551,17 @@ def s2latex (sbmlArgument, file_path = None):
                 latexstr = getLaTeXFromAST (FunctionDefinitions[i][1])
                 
                 with doc.create(Subsection('Function ' + str(i+1))): 
+                    doc.append(Command("begin", "dmath*"))
                     doc.append (NoEscape ('$$' + '\\text{' + FunctionDefinitions[i][0].replace('_','\\_') + '}\ ('))
                     for j in range (0, len (FunctionArgList)):
-                        if len(FunctionArgList)>10: 
-                            break
+                        
                         latexarg = getLaTeXFromAST(FunctionArgList[j])
                         if j == len (FunctionArgList)-1:
                            doc.append(NoEscape(str(latexarg.replace('_','\\_'))))
                         else: 
                            doc.append(NoEscape(latexarg.replace('_','\\_') + ','))
                     doc.append(NoEscape ('): ' + latexstr.replace('_','\\_') + '$$'))
+                    doc.append(Command("end","dmath*"))
 
     # PROCESS EVENTS
     listlen = len(Events)
@@ -558,7 +595,9 @@ def s2latex (sbmlArgument, file_path = None):
                     m = readMathMLFromString(Reactions[i][5][0])
                     formula = getLaTeXFromAST (m)
                     formula = formula.replace ('\mathrm', '\ \mathrm')
+                    doc.append(Command("begin","dmath*"))
                     doc.append(NoEscape('$$v =' + formula.replace('_','\\_') + '$$'))
+                    doc.append(Command("end","dmath*"))
                 with doc.create(Subsubsection('Local Parameters')):
                     if len(Reactions[i][5][1]) != 0:
                         sublistlen = len(Reactions[i][5][1][0])
@@ -575,17 +614,76 @@ def s2latex (sbmlArgument, file_path = None):
                                 table.add_hline()
                     else:
                         doc.append('No LOCAL Parameters found')
+                        
         
     del(Command, Document, NoEscape, Section, Subsection, italic)
-    import traceback
-    if (file_path == None):
-        return doc.dumps()
-    else:
-        try:
-            doc.generate_pdf(filepath = file_path)
-        except:
-            print("An error in compilation has occured.\n An attempt to generate .tex object was made. \n The error came with following message:")
-            traceback.print_exc()
-            with open(file_path+'.tex', 'w') as f:
-                f.write(doc.dumps())
+    return doc.dumps()
+    
+#    if (file_path == None):
+#        return doc.dumps()
+#    else:
+#        try:
+#            doc.generate_pdf(filepath = file_path)
+#        except:
+#            print("An error in compilation has occured.\n An attempt to generate .tex object was made. \n The error came with following message:")
+#            traceback.print_exc()
+#            with open(file_path+'.tex', 'w') as f:
+#                f.write(doc.dumps())
+                
+def get_file_path():
+    
+    d = os.getcwd()
+    return d+ "/sb2l_document"
+                
+def s2latex(sbmlArgument, file_path = None):
+    
+    if file_path is None:
+        file_path = get_file_path()
+        
+    string = s2string(sbmlArgument)
+    with open(file_path+'.tex', 'w') as f:
+        f.write(string)
+                
+def s2pdf(sbmlArgument, compiler = None, file_path = None, compiler_args = None):
+    import subprocess
+    
+    s2latex(sbmlArgument, file_path) 
+    
+    if file_path is None:
+        file_path = get_file_path()
+    
+    cur_dir = os.getcwd()
+    dest_dir = os.path.dirname(file_path)
+    basename = os.path.basename(file_path)
+    
+    os.chdir(dest_dir)
+#    if compiler is not None:
+#            compilers = ((compiler, []),)
+#    else:
+#        latexmk_args = ['--pdf']
+#
+#        compilers = (
+#            ('latexmk', latexmk_args),
+#            ('pdflatex', [])
+#        )
+#    for compiler, args in compilers:
+        
+            
+    if compiler_args is None:
+            compiler_args = []
+            
+    main_arg = [basename + ".tex"]
+    
+    command = ["latexmk", "--pdf"] + compiler_args + main_arg
+    
+    try:
+        output = subprocess.check_output(command)
+    except subprocess.CalledProcessError as e:
+        print(e.output.decode())
+        raise
+    
+    os.chdir(cur_dir)
+    
+    
+#def s2win(sbmlArgument, file_path = None):
 
