@@ -6,8 +6,6 @@
 @author: XJiang, HSauro
 SBML Utilitites
 """
-
-
 import os
 
 def s2string (sbmlArgument, file_path = None):
@@ -39,8 +37,8 @@ def s2string (sbmlArgument, file_path = None):
         from lxml import etree
         import os
         """ MathML to LaTeX conversion with XSLT from Vasil Yaroshevich, Modified by Xieergai Jiang"""
-        script_base_path = os.path.dirname(os.path.realpath(__file__))
-        
+        #script_base_path = os.path.dirname(os.path.realpath(__file__))
+        script_base_path = "/Users/sergejczan/Desktop/For GItHub and PyPi/sb2latex modifications/sb2l" #REPLACE THAT BEFORE UPLOAD
         xslt_file = os.path.join(script_base_path, 'xsl_yarosh', 'mmltex.xsl')
         dom = etree.fromstring(equation)
         xslt = etree.parse(xslt_file)
@@ -49,11 +47,14 @@ def s2string (sbmlArgument, file_path = None):
         return str(newdom)
 
     def getLaTeXFromAST (tree):
-        xmlstr = writeMathMLToString(tree)
-        # Strip out the header
-        xmlstr = xmlstr.replace ('<?xml version="1.0" encoding="UTF-8"?>', '')
+#        xmlstr = writeMathMLToString(tree)
+#        # Strip out the header
+#        xmlstr = xmlstr.replace ('<?xml version="1.0" encoding="UTF-8"?>', '')
+#        
+#        return  mathml2latex_yarosh(xmlstr).strip ('$')
+        from MATH import convertToInfix
         
-        return  mathml2latex_yarosh(xmlstr).strip ('$')
+        return convertToInfix(tree)
 
     #The zeroes are out of nessessity, I don't know why, but just having a single obj variable does not work
     #So, predefined all classes that are used later
@@ -619,16 +620,6 @@ def s2string (sbmlArgument, file_path = None):
     del(Command, Document, NoEscape, Section, Subsection, italic)
     return doc.dumps()
     
-#    if (file_path == None):
-#        return doc.dumps()
-#    else:
-#        try:
-#            doc.generate_pdf(filepath = file_path)
-#        except:
-#            print("An error in compilation has occured.\n An attempt to generate .tex object was made. \n The error came with following message:")
-#            traceback.print_exc()
-#            with open(file_path+'.tex', 'w') as f:
-#                f.write(doc.dumps())
                 
 def get_file_path():
     
@@ -644,8 +635,8 @@ def s2latex(sbmlArgument, file_path = None):
     with open(file_path+'.tex', 'w') as f:
         f.write(string)
                 
-def s2pdf(sbmlArgument, compiler = None, file_path = None, compiler_args = None):
-    import subprocess
+def s2pdf(sbmlArgument, compiler = None, file_path = None, compiler_args = None, shellpath = None):
+    import subprocess, platform
     
     s2latex(sbmlArgument, file_path) 
     
@@ -657,33 +648,76 @@ def s2pdf(sbmlArgument, compiler = None, file_path = None, compiler_args = None)
     basename = os.path.basename(file_path)
     
     os.chdir(dest_dir)
-#    if compiler is not None:
-#            compilers = ((compiler, []),)
-#    else:
-#        latexmk_args = ['--pdf']
-#
-#        compilers = (
-#            ('latexmk', latexmk_args),
-#            ('pdflatex', [])
-#        )
-#    for compiler, args in compilers:
-        
-            
+    
+    
+    if compiler is not None:
+            compilers = ((compiler, []),)
+    else:
+        latexmk_arg = ['--pdf']
+
+        compilers = (
+            ('latexmk', latexmk_arg),
+            ('pdflatex', [])
+        )
     if compiler_args is None:
             compiler_args = []
-            
+        
     main_arg = [basename + ".tex"]
     
-    command = ["latexmk", "--pdf"] + compiler_args + main_arg
+    for compiler, args in compilers:
+        command = [compiler]+ args + compiler_args + main_arg
+        
+        try:
+            output = subprocess.check_output(command)
+            
+        except OSError as e:
+            if e.errno == 2:
+                # If could not find, try hardcoding a PATH
+                # Probably won't work on other computers though, need
+                # to somehow find a way to get the bash shell PATH 
+                # and put it into the python environment
+                    #For now, have option to predefine PATH
+                try:
+                    if shellpath is None and platform.system() != 'Windows' :
+                        output = subprocess.check_output(command, env = {
+                                'PATH': os.environ['PATH']+ ":/Library/TeX/texbin"})
+                    else:
+                        output = subprocess.check_output(command, env = shellpath)
+                        
+                except subprocess.CalledProcessError as e:
+                    print(e.output.decode())
+                    raise
+                continue
+            raise
+            
+        except subprocess.CalledProcessError as e:
+            print(e.output.decode())
+            raise
     
-    try:
-        output = subprocess.check_output(command)
-    except subprocess.CalledProcessError as e:
-        print(e.output.decode())
-        raise
+        else:
+            print("Could not find compiler, if compiler is installed, try predefining " +
+              "the shellpath to that of your terminal")
     
     os.chdir(cur_dir)
     
     
-#def s2win(sbmlArgument, file_path = None):
-
+def s2open(sbmlArgument, compiler = None, file_path = None, compiler_args = None, shellpath = None):
+    import subprocess, platform
+    
+    s2pdf(sbmlArgument, compiler, file_path, compiler_args, shellpath)
+    
+    if file_path is None:
+        file_path = get_file_path()
+    #platform opening courtesy of stackoverflow page:
+    #https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+    
+    if platform.system() == 'Darwin':       # macOS
+        subprocess.call(['open', file_path + '.pdf'])
+    elif platform.system() == 'Windows':    # Windows
+        os.startfile(file_path+ '.pdf')
+    else:                                   # linux variants
+        subprocess.call(('xdg-open', file_path + '.pdf'))
+    
+    
+    
+        
