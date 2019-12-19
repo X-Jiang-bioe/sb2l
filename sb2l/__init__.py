@@ -6,4 +6,4 @@ Created on Fri Oct 18 14:43:56 2019
 @author: sergejczan
 """
 
-from .sb2l import s2latex
+from .sb2l import s2latex, s2string, s2pdf, s2open
