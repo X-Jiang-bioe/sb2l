@@ -7,7 +7,7 @@ setuptools.setup(
   name = 'sb2l',         
   packages=setuptools.find_packages(),
   
-  version = '0.1.2',      
+  version = '0.1.3',      
   license='MIT',        
   description = 'sb2l Translates the biological models written in SBML into LaTeX code to be compiled and read by human eye',  
   long_description=long_description,
@@ -16,11 +16,11 @@ setuptools.setup(
   author_email = 'jiangxieergai@gmail.com',      
   url = 'https://github.com/X-Jiang-bioe/sb2l',   
   
-  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.2.tar.gz',  
+  download_url = 'https://github.com/X-Jiang-bioe/sb2l/archive/v_0.1.3.tar.gz',  
   
   
   package_data={
-        '': ['*.xsl', '*.rtf'], # to include yarosh files
+        '': ['*.rtf'], # to include yarosh files
     },
   
   keywords = ['SBML', 'LaTeX', 'Converter'],   
