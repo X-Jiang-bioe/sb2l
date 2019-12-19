@@ -25,7 +25,7 @@ latexStr = sb2l.s2string(sbmlStringOrFile)
 If using with Tellurium or Antimony: 
 ```
 import sb2l
-latexStr = sb2l.s2latex(model_name.getSBML())
+latexStr = sb2l.s2string(model_name.getSBML())
 ```
 For making PDF files (The filepath must NOT have a .pdf or .tex suffix)
 ```
