@@ -6,7 +6,9 @@ Translates biological models written in SBML into LaTeX code to be compiled and 
 
 ### Dependencies ###
 
-The current version runs 1.3.1 version of PyLaTeX
+The current version runs 1.3.1 version of `PyLaTeX`
+
+Either `Tellurium` or `python-libsbml` is also required 
 
 For PDF creation functionality, either `latexmk` or `pdflatex` needs to be installed on the computer
 
@@ -18,7 +20,7 @@ For PDF creation functionality, either `latexmk` or `pdflatex` needs to be insta
 The following structure gives a LaTeX string that can be copied to a online compiler like `Overleaf`:
 ```
 import sb2l
-latexStr = sb2l.s2latex(sbmlStringOrFile)
+latexStr = sb2l.s2string(sbmlStringOrFile)
 ```
 If using with Tellurium or Antimony: 
 ```
@@ -28,8 +30,17 @@ latexStr = sb2l.s2latex(model_name.getSBML())
 For making PDF files (The filepath must NOT have a .pdf or .tex suffix)
 ```
 import sb2l
-filepath = "/Users/Username/Desktop/theDesiredName" #[NOTICE: no ".anything"]
-sb2l.s2latex(sbmlStringOrFile, filepath);
+filepath = "/Users/Username/Desktop/theDesiredNameOfFile" #[NOTICE: no ".anything"]
+sb2l.s2pdf(sbmlStringOrFile, file_path = filepath);
+```
+The same structure can be used to generate a .tex file if used with `sb2l.s2latex`
+
+To generate the PDF file and open with the default PDF reader
+
+```
+import sb2l
+filepath = "/Users/Username/Desktop/theDesiredNameOfFile" #[NOTICE: no ".anything"]
+sb2l.s2open(sbmlStringOrFile, file_path = filepath);
 ```
 ### License ###
 
