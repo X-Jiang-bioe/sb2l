@@ -13,7 +13,7 @@ except:
 
 def convertOperator (op):
     if op == 'times':
-        return '*' # To make sure there is space between symbols
+        return '*' # I really think this should be used instead of a space, with long eq-s spaces are confusing
     if op == 'plus':
         return '+'
     if op == 'minus':
@@ -51,15 +51,17 @@ def isParensOnRight (ast):
        return False
    
     if ast.getOperatorName () == 'plus' or ast.getOperatorName() == 'times':
-       return ast.getRightChild().getPrecedence() < ast.getPrecedence()
+       return ast.getRightChild().getPrecedence() < ast.getPrecedence() #precedence is important for parentheses placement
     return ast.getRightChild().getPrecedence() <= ast.getPrecedence()
    
 
 def convertToInfix (ast):
+    # This function is implemented recursivlely, so after the tree is given, each instance of a node/leaf
+    # causes convertToInfix to call to itself 
     lhs = ''; rhs = ''; frac = False; pwr = False;
     
     if ast.isFunction() :
-       if ast.getName() == 'power': #the fix is here
+       if ast.getName() == 'power': #the fix of power, as far as I understand this should be a special case
            return '\\left(' + convertToInfix (ast.getLeftChild())+ '\\right)^{'+ convertToInfix(ast.getRightChild())+ '}'
        lhs = '\\' + ast.getName() + '\\left('      
        return lhs + convertToInfix (ast.getLeftChild()) + '\\right)'
@@ -115,7 +117,7 @@ def convertToInfix (ast):
     else:
        return '\\mathrm{' + ast.getName() + '}'
 
-     
+#This is for troubleshooting     
 #r = te.loada("""
 #       
 #function quadratic(x, a, b, c)
