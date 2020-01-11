@@ -33,18 +33,6 @@ def s2string (sbmlArgument, file_path = None):
     import pathlib # For extracting file extensions
     import os
     
-    def mathml2latex_yarosh(equation):
-        from lxml import etree
-        import os
-        """ MathML to LaTeX conversion with XSLT from Vasil Yaroshevich, Modified by Xieergai Jiang"""
-        #script_base_path = os.path.dirname(os.path.realpath(__file__))
-        script_base_path = "/Users/sergejczan/Desktop/For GItHub and PyPi/sb2latex modifications/sb2l" #REPLACE THAT BEFORE UPLOAD
-        xslt_file = os.path.join(script_base_path, 'xsl_yarosh', 'mmltex.xsl')
-        dom = etree.fromstring(equation)
-        xslt = etree.parse(xslt_file)
-        transform = etree.XSLT(xslt)
-        newdom = transform(dom)
-        return str(newdom)
 
     def getLaTeXFromAST (tree):
 #        xmlstr = writeMathMLToString(tree)
